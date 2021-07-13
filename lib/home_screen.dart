@@ -1,3 +1,6 @@
+import 'dart:ui';
+
+import 'package:aacalc/constants.dart';
 import 'package:aacalc/styling.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -74,6 +77,163 @@ class _HomeScreenState extends State<HomeScreen> {
     return moneyFormat;
   }
 
+  Widget _customTextField(TextEditingController tec, String hintString,
+      String title, String subtitle) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10.0),
+      child: Stack(
+        alignment: Alignment.centerRight,
+        children: [
+          Container(
+            height: 60,
+            decoration: ShapeDecoration(
+              shadows: [
+                BoxShadow(
+                  color: Colors.black12,
+                  offset: Offset(1, 1),
+                )
+              ],
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(32),
+                  bottomLeft: Radius.circular(32),
+                ),
+              ),
+              gradient: LinearGradient(
+                colors: [Color(0xFFe6dfd8), Color(0xFFf7f5ec)],
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                stops: [0, .4],
+                tileMode: TileMode.clamp,
+              ),
+            ),
+            child: TextField(
+              controller: tec,
+              onChanged: (v) {
+                tec.text = getMoneyFormatString(tec.text);
+                tec.selection = TextSelection.fromPosition(
+                  TextPosition(offset: tec.text.length),
+                );
+              },
+              decoration: InputDecoration(
+                  prefixText: "     ",
+                  filled: true,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(32),
+                      bottomLeft: Radius.circular(32),
+                    ),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(32)),
+                    borderSide: BorderSide(
+                      color: Colors.white,
+                    ),
+                  ),
+                  hintText: hintString,
+                  hintStyle: TextStyle(color: Colors.black26)),
+              keyboardType: TextInputType.number,
+              textInputAction: TextInputAction.next,
+            ),
+          ),
+          Container(
+            alignment: Alignment.center,
+            width: 120,
+            height: 60,
+            decoration: BoxDecoration(
+              color: AppTheme.cardOverEditTextColor,
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(50),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black26,
+                  offset: Offset(-4, 0),
+                )
+              ],
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  title,
+                  style: Theme.of(context).textTheme.bodyText1,
+                ),
+                if (subtitle != "")
+                  Text(
+                    subtitle,
+                    style: Theme.of(context).textTheme.caption,
+                  ),
+              ],
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
+  Widget _resultContainer() {
+    return Container(
+      height: 100,
+      width: double.infinity,
+      alignment: Alignment.center,
+      margin: EdgeInsets.only(bottom: 40),
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.blueAccent, width: 1),
+        borderRadius: BorderRadius.all(
+          Radius.circular(100),
+        ),
+        color: AppTheme.resultButtonColor,
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          Flexible(
+            flex: 30,
+            child: Text(
+              Constants.MONEY_UNIT,
+              style: Theme.of(context).textTheme.caption,
+            ),
+          ),
+          Flexible(
+            flex: 60,
+            child: Text(
+              "$result",
+              style: Theme.of(context).textTheme.headline6,
+            ),
+          ),
+          Flexible(
+            flex: 30,
+            child: Text(""),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _calculateButton() {
+    return Container(
+      height: 70,
+      width: double.infinity,
+      margin: EdgeInsets.only(bottom: 120, left: 50, right: 50),
+      child: ElevatedButton(
+        onPressed: _calculateResult,
+        style: ElevatedButton.styleFrom(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(100),
+          ),
+        ),
+        child: Center(
+          child: Text(
+            Constants.BUTTON_TITLE,
+            style: Theme.of(context).textTheme.button,
+          ),
+          // style: ButtonStyle(shape: ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -98,379 +258,21 @@ class _HomeScreenState extends State<HomeScreen> {
                     padding: const EdgeInsets.all(40.0),
                     child: Column(
                       children: [
-                        Container(
-                            height: 100,
-                            width: double.infinity,
-                            alignment: Alignment.center,
-                            margin: EdgeInsets.only(bottom: 60),
-                            decoration: BoxDecoration(
-                              border: Border.all(
-                                  color: Colors.blueAccent, width: 1),
-                              borderRadius: BorderRadius.all(
-                                Radius.circular(100),
-                              ),
-                              color: AppTheme.resultButtonColor,
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: [
-                                Flexible(
-                                  flex: 30,
-                                  child: Text(
-                                    "تومان",
-                                    style: Theme.of(context).textTheme.caption,
-                                  ),
-                                ),
-                                Flexible(
-                                  flex: 60,
-                                  child: Text(
-                                    "$result",
-                                    style:
-                                        Theme.of(context).textTheme.headline6,
-                                  ),
-                                ),
-                                Flexible(
-                                  flex: 30,
-                                  child: Text(""),
-                                ),
-                              ],
-                            )),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 10.0),
-                          child: Stack(
-                            alignment: Alignment.centerRight,
-                            children: [
-                              Container(
-                                height: 60,
-                                decoration: ShapeDecoration(
-                                    shadows: [
-                                      BoxShadow(
-                                        color: Colors.black12,
-                                        offset: Offset(1, 1),
-                                      )
-                                    ],
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.only(
-                                        topLeft: Radius.circular(32),
-                                        bottomLeft: Radius.circular(32),
-                                      ),
-                                    ),
-                                    gradient: LinearGradient(
-                                      colors: [
-                                        Color(0xFFe6dfd8),
-                                        Color(0xFFf7f5ec)
-                                      ],
-                                      begin: Alignment.topCenter,
-                                      end: Alignment.bottomCenter,
-                                      stops: [0, .4],
-                                      tileMode: TileMode.clamp,
-                                    )),
-                                child: TextField(
-                                  controller: _purchaserController,
-                                  onChanged: (v) {
-                                    _purchaserController.text =
-                                        getMoneyFormatString(
-                                            _purchaserController.text);
-                                    _purchaserController.selection =
-                                        TextSelection.fromPosition(
-                                      TextPosition(
-                                          offset:
-                                              _purchaserController.text.length),
-                                    );
-                                  },
-                                  decoration: InputDecoration(
-                                    prefixText: "     ",
-                                    // contentPadding: EdgeInsets.all(40),
-                                    // fillColor: Colors.white.withOpacity(0.5),
-                                    filled: true,
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.only(
-                                        topLeft: Radius.circular(32),
-                                        bottomLeft: Radius.circular(32),
-                                      ),
-                                    ),
-                                    enabledBorder: OutlineInputBorder(
-                                      // borderRadius: BorderRadius.only(
-                                      //   topLeft: Radius.circular(20),
-                                      //   bottomLeft: Radius.circular(20),
-                                      // ),
-
-                                      borderRadius:
-                                          BorderRadius.all(Radius.circular(32)),
-                                      borderSide: BorderSide(
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                    hintText: "3,500,00",
-                                  ),
-                                  keyboardType: TextInputType.number,
-                                  textInputAction: TextInputAction.next,
-                                ),
-                              ),
-                              Container(
-                                alignment: Alignment.center,
-                                width: 120,
-                                height: 60,
-                                decoration: BoxDecoration(
-                                  color: AppTheme.cardOverEditTextColor,
-                                  borderRadius: BorderRadius.only(
-                                    topLeft: Radius.circular(50),
-                                  ),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black26,
-                                      offset: Offset(-4, 0),
-                                    )
-                                  ],
-                                ),
-                                child: Text(
-                                  "خریداران",
-                                  style: Theme.of(context).textTheme.bodyText1,
-                                ),
-                              )
-                            ],
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 10.0),
-                          child: Stack(
-                            alignment: Alignment.centerRight,
-                            children: [
-                              Container(
-                                height: 60,
-                                decoration: ShapeDecoration(
-                                    shadows: [
-                                      BoxShadow(
-                                        color: Colors.black12,
-                                        offset: Offset(1, 1),
-                                      )
-                                    ],
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.only(
-                                        topLeft: Radius.circular(32),
-                                        bottomLeft: Radius.circular(32),
-                                      ),
-                                    ),
-                                    gradient: LinearGradient(
-                                      colors: [
-                                        Color(0xFFe6dfd8),
-                                        Color(0xFFf7f5ec)
-                                      ],
-                                      begin: Alignment.topCenter,
-                                      end: Alignment.bottomCenter,
-                                      stops: [0, .4],
-                                      tileMode: TileMode.clamp,
-                                    )),
-                                child: TextField(
-                                  controller: _stockNumbersController,
-                                  onChanged: (v) {
-                                    _stockNumbersController.text =
-                                        getMoneyFormatString(
-                                            _stockNumbersController.text);
-                                    _stockNumbersController.selection =
-                                        TextSelection.fromPosition(
-                                      TextPosition(
-                                          offset: _stockNumbersController
-                                              .text.length),
-                                    );
-                                  },
-                                  decoration: InputDecoration(
-                                    prefixText: "     ",
-                                    // contentPadding: EdgeInsets.all(40),
-                                    // fillColor: Colors.white.withOpacity(0.5),
-                                    filled: true,
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.only(
-                                        topLeft: Radius.circular(32),
-                                        bottomLeft: Radius.circular(32),
-                                      ),
-                                    ),
-                                    enabledBorder: OutlineInputBorder(
-                                      // borderRadius: BorderRadius.only(
-                                      //   topLeft: Radius.circular(20),
-                                      //   bottomLeft: Radius.circular(20),
-                                      // ),
-
-                                      borderRadius:
-                                          BorderRadius.all(Radius.circular(32)),
-                                      borderSide: BorderSide(
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                    hintText: "300,000",
-                                  ),
-                                  keyboardType: TextInputType.number,
-                                  textInputAction: TextInputAction.next,
-                                ),
-                              ),
-                              Container(
-                                alignment: Alignment.center,
-                                width: 120,
-                                height: 60,
-                                decoration: BoxDecoration(
-                                  color: AppTheme.cardOverEditTextColor,
-                                  borderRadius: BorderRadius.only(
-                                    topLeft: Radius.circular(50),
-                                  ),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black26,
-                                      offset: Offset(-4, 0),
-                                    )
-                                  ],
-                                ),
-                                child: Text(
-                                  "تعداد سهام",
-                                  style: Theme.of(context).textTheme.bodyText1,
-                                ),
-                              )
-                            ],
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 10.0),
-                          child: Stack(
-                            alignment: Alignment.centerRight,
-                            children: [
-                              Container(
-                                height: 60,
-                                decoration: ShapeDecoration(
-                                    shadows: [
-                                      BoxShadow(
-                                        color: Colors.black12,
-                                        offset: Offset(1, 1),
-                                      )
-                                    ],
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.only(
-                                        topLeft: Radius.circular(32),
-                                        bottomLeft: Radius.circular(32),
-                                      ),
-                                    ),
-                                    gradient: LinearGradient(
-                                      colors: [
-                                        Color(0xFFe6dfd8),
-                                        Color(0xFFf7f5ec)
-                                      ],
-                                      begin: Alignment.topCenter,
-                                      end: Alignment.bottomCenter,
-                                      stops: [0, .4],
-                                      tileMode: TileMode.clamp,
-                                    )),
-                                child: TextField(
-                                  controller: _maxPriceController,
-                                  onChanged: (v) {
-                                    _maxPriceController.text =
-                                        getMoneyFormatString(
-                                            _maxPriceController.text);
-                                    _maxPriceController.selection =
-                                        TextSelection.fromPosition(
-                                      TextPosition(
-                                          offset:
-                                              _maxPriceController.text.length),
-                                    );
-                                  },
-                                  decoration: InputDecoration(
-                                    prefixText: "     ",
-                                    // contentPadding: EdgeInsets.all(40),
-                                    // fillColor: Colors.white.withOpacity(0.5),
-                                    filled: true,
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.only(
-                                        topLeft: Radius.circular(32),
-                                        bottomLeft: Radius.circular(32),
-                                      ),
-                                    ),
-                                    enabledBorder: OutlineInputBorder(
-                                      // borderRadius: BorderRadius.only(
-                                      //   topLeft: Radius.circular(20),
-                                      //   bottomLeft: Radius.circular(20),
-                                      // ),
-
-                                      borderRadius:
-                                          BorderRadius.all(Radius.circular(32)),
-                                      borderSide: BorderSide(
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                    hintText: "2,950",
-                                  ),
-                                  keyboardType: TextInputType.number,
-                                  textInputAction: TextInputAction.next,
-                                ),
-                              ),
-                              Container(
-                                alignment: Alignment.center,
-                                width: 120,
-                                height: 60,
-                                decoration: BoxDecoration(
-                                  color: AppTheme.cardOverEditTextColor,
-                                  borderRadius: BorderRadius.only(
-                                    topLeft: Radius.circular(50),
-                                  ),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black26,
-                                      offset: Offset(-4, 0),
-                                    )
-                                  ],
-                                ),
-                                child: Text(
-                                  "حداکثر قیمت",
-                                  style: Theme.of(context).textTheme.bodyText1,
-                                ),
-                              )
-                            ],
-                          ),
-                        ),
+                        _resultContainer(),
+                        _customTextField(_purchaserController, "3 500 000",
+                            Constants.PURCHASER_COUNT_TITLE, ""),
+                        _customTextField(_stockNumbersController, "250 000 000",
+                            Constants.STOCK_COUNT_TITLE, ""),
+                        _customTextField(_maxPriceController, "2 100",
+                            Constants.MAX_PRICE_TITLE, Constants.MONEY_UNIT),
                       ],
                     ),
                   ),
                 ),
                 Align(
                   alignment: Alignment.bottomCenter,
-                  child: Container(
-                    height: 70,
-                    width: double.infinity,
-                    margin: EdgeInsets.only(bottom: 170, left: 50, right: 50),
-                    child: ElevatedButton(
-                      onPressed: _calculateResult,
-                      style: ElevatedButton.styleFrom(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(100),
-                        ),
-                      ),
-                      child: Center(
-                        child: Text(
-                          "محاسبه",
-                          style: Theme.of(context).textTheme.button,
-                        ),
-                        // style: ButtonStyle(shape: ),
-                      ),
-                    ),
-                  ),
+                  child: _calculateButton(),
                 ),
-                // Align(
-                //   alignment: Alignment.bottomCenter,
-                //   child: Stack(children: [
-                //     Container(
-                //       height: 70,
-                //       width: 250,
-                //       margin: EdgeInsets.only(bottom: 20),
-                //       // color: Colors.black,
-                //       child: ElevatedButton(
-                //         clipBehavior: Clip.none,
-                //         onPressed: () {},
-                //         child: null,
-                //         style: ElevatedButton.styleFrom(
-                //           shape: RoundedRectangleBorder(
-                //             borderRadius: BorderRadius.circular(100),
-                //           ),
-                //         ),
-                //       ),
-                //     ),
-                //   ]),
-                // )
               ],
             ),
           ),
