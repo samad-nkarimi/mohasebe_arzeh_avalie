@@ -13,38 +13,64 @@ class _HomeScreenState extends State<HomeScreen> {
   final TextEditingController _purchaserController = TextEditingController();
   final TextEditingController _stockNumbersController = TextEditingController();
   final TextEditingController _maxPriceController = TextEditingController();
+  final String splitCharacter = " ";
   String result = "000";
 
   void _calculateResult() {
-    double numPurchases = double.parse(_purchaserController.text);
-    double numStocks = double.parse(_stockNumbersController.text);
-    double price = double.parse(_maxPriceController.text);
+    double numPurchases =
+        double.parse(_purchaserController.text.replaceAll(splitCharacter, ""));
+    double numStocks = double.parse(
+        _stockNumbersController.text.replaceAll(splitCharacter, ""));
+    double price =
+        double.parse(_maxPriceController.text.replaceAll(splitCharacter, ""));
     print(numPurchases);
     print(numStocks);
     print(price);
 
     double doubleResult = (numStocks * price) / (numPurchases);
     int intResult = doubleResult.toInt();
+    intResult = (intResult ~/ 1000) * 1000;
     setState(() {
-      result = intResult.toString();
+      result = getMoneyFormatString(intResult.toString());
     });
+
+    print(getMoneyFormatString(""));
+    print(getMoneyFormatString("3"));
+    print(getMoneyFormatString("35"));
+    print(getMoneyFormatString("350"));
+    print(getMoneyFormatString("3500"));
+    print(getMoneyFormatString("35000"));
+    print(getMoneyFormatString("350000"));
+    print(getMoneyFormatString("3500000"));
+    print(getMoneyFormatString("35000000"));
+    print(getMoneyFormatString("350000000"));
   }
 
   String getMoneyFormatString(String input) {
+    input = input.replaceAll(splitCharacter, "");
     String moneyFormat = "";
     String slice = "";
     // slice.replaceAll(",", "replace");
     int inputLength = input.length;
-    int loopCount = inputLength ~/ 3;
-    int helper = inputLength - loopCount * 3;
-    int start = 0;
+    if (inputLength <= 3)
+      moneyFormat = input;
+    else {
+      int loopCount = inputLength ~/ 3;
+      int helper = inputLength - loopCount * 3;
+      int start = 0;
 
-    for (var i = 0; i < loopCount; i++) {
-      slice = input.substring(start, helper + (3 * i));
-      moneyFormat = moneyFormat + "," + slice;
-      start = helper + (3 * i);
+      for (var i = 0; i <= loopCount; i++) {
+        slice = input.substring(start, helper + (3 * i));
+        if (i == 0)
+          moneyFormat = slice;
+        else
+          moneyFormat = moneyFormat + splitCharacter + slice;
+        start = helper + (3 * i);
+      }
+
+      if (helper == 0) moneyFormat = moneyFormat.substring(1);
     }
-    if (input.length > 3) {}
+
     return moneyFormat;
   }
 
@@ -141,6 +167,17 @@ class _HomeScreenState extends State<HomeScreen> {
                                     )),
                                 child: TextField(
                                   controller: _purchaserController,
+                                  onChanged: (v) {
+                                    _purchaserController.text =
+                                        getMoneyFormatString(
+                                            _purchaserController.text);
+                                    _purchaserController.selection =
+                                        TextSelection.fromPosition(
+                                      TextPosition(
+                                          offset:
+                                              _purchaserController.text.length),
+                                    );
+                                  },
                                   decoration: InputDecoration(
                                     prefixText: "     ",
                                     // contentPadding: EdgeInsets.all(40),
@@ -226,6 +263,17 @@ class _HomeScreenState extends State<HomeScreen> {
                                     )),
                                 child: TextField(
                                   controller: _stockNumbersController,
+                                  onChanged: (v) {
+                                    _stockNumbersController.text =
+                                        getMoneyFormatString(
+                                            _stockNumbersController.text);
+                                    _stockNumbersController.selection =
+                                        TextSelection.fromPosition(
+                                      TextPosition(
+                                          offset: _stockNumbersController
+                                              .text.length),
+                                    );
+                                  },
                                   decoration: InputDecoration(
                                     prefixText: "     ",
                                     // contentPadding: EdgeInsets.all(40),
@@ -311,6 +359,17 @@ class _HomeScreenState extends State<HomeScreen> {
                                     )),
                                 child: TextField(
                                   controller: _maxPriceController,
+                                  onChanged: (v) {
+                                    _maxPriceController.text =
+                                        getMoneyFormatString(
+                                            _maxPriceController.text);
+                                    _maxPriceController.selection =
+                                        TextSelection.fromPosition(
+                                      TextPosition(
+                                          offset:
+                                              _maxPriceController.text.length),
+                                    );
+                                  },
                                   decoration: InputDecoration(
                                     prefixText: "     ",
                                     // contentPadding: EdgeInsets.all(40),
